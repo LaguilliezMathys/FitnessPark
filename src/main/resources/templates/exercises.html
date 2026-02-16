@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{_layout::header(~{::title}, _, ~{::script})}">
+    <title>Exercices</title>
+    <script>
+        function confirmerSupp(event) {
+            if(!confirm("Confirmer la suppression de cet exercice ?")) {
+                event.preventDefault();
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <nav th:replace="~{_layout::menu}"/>
+    
+    <div class="container mt-5">
+        <h1 class="mb-4"><i class="fa-solid fa-running"></i> Gestion des Exercices</h1>
+        
+        <!-- Formulaire de recherche -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <form th:action="@{/exercises}" method="get" class="input-group">
+                    <input type="text" name="mc" th:value="${motCle}" class="form-control" 
+                           placeholder="Rechercher un exercice..." />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-search"></i> Rechercher
+                    </button>
+                </form>
+            </div>
+            <div class="col-md-6 text-end">
+                <a th:href="@{/exerciseEdit(id=0, mc=${motCle}, p=${page.number}, s=${page.size})}" 
+                   class="btn btn-success">
+                    <i class="fa fa-plus"></i> Ajouter un exercice
+                </a>
+            </div>
+        </div>
+        
+        <!-- Alertes feedback -->
+        <div th:if="${action=='new' || action=='mod'}" class="alert alert-success alert-dismissible fade show">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <span th:if="${action=='new'}"><i class="fa fa-check-circle"></i> Exercice créé avec succès : </span>
+            <span th:if="${action=='mod'}"><i class="fa fa-edit"></i> Exercice modifié avec succès : </span>
+            <strong th:text="${exercise.name}"></strong>
+        </div>
+        <div th:if="${action=='del'}" class="alert alert-warning alert-dismissible fade show">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <i class="fa fa-trash"></i> Exercice supprimé avec succès
+        </div>
+        
+        <!-- Tableau des exercices -->
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Routine</th>
+                        <th>Nom</th>
+                        <th>Répétitions</th>
+                        <th>Poids (kg)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="exercise : ${exercises}">
+                        <td th:text="${exercise.routine.name}"></td>
+                        <td th:text="${exercise.name}"></td>
+                        <td th:text="${exercise.repetitions}"></td>
+                        <td th:text="${ #numbers.formatDecimal(exercise.weight, 1, 2)} + ' kg'"></td>
+                        <td>
+                            <a th:href="@{/exerciseEdit(id=${exercise.id}, mc=${motCle}, p=${page.number}, s=${page.size})}" 
+                               class="btn btn-sm btn-primary" title="Éditer">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <a th:href="@{/exerciseDelete(id=${exercise.id}, mc=${motCle}, p=${page.number}, s=${page.size})}" 
+                               onclick="confirmerSupp(event)" class="btn btn-sm btn-danger" title="Supprimer">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="row mt-3" th:if="${page.totalPages > 1}">
+            <div class="col-md-6">
+                <ul class="pagination">
+                    <li th:class="${page.first} ? 'page-item disabled' : 'page-item'">
+                        <a th:href="@{/exercises(s=${page.size}, p=${page.number - 1}, mc=${motCle})}" 
+                           class="page-link">&laquo;</a>
+                    </li>
+                    <li th:each="i : ${ #numbers.sequence(0, page.totalPages-1)}"
+                        th:class="${i == page.number} ? 'page-item active' : 'page-item'">
+                        <a th:href="@{/exercises(s=${page.size}, p=${i}, mc=${motCle})}" 
+                           class="page-link" th:text="${i+1}"></a>
+                    </li>
+                    <li th:class="${page.last} ? 'page-item disabled' : 'page-item'">
+                        <a th:href="@{/exercises(s=${page.size}, p=${page.number + 1}, mc=${motCle})}" 
+                           class="page-link">&raquo;</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-6 text-end">
+                <form method="get" class="d-inline-block">
+                    <input type="hidden" name="p" th:value="${page.number}" />
+                    <input type="hidden" name="mc" th:value="${motCle}" />
+                    <label>Éléments par page : </label>
+                    <select name="s" onchange="this.form.submit()" class="form-select d-inline-block w-auto">
+                        <option value="5" th:selected="${page.size==5}">5</option>
+                        <option value="10" th:selected="${page.size==10}">10</option>
+                        <option value="20" th:selected="${page.size==20}">20</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+        
+        <p class="text-muted mt-3">
+            Total : <strong th:text="${page.totalElements}"></strong> exercice(s) - 
+            Page <strong th:text="${page.number + 1}"></strong> sur <strong th:text="${page.totalPages}"></strong>
+        </p>
+    </div>
+</body>
+
+</html>

@@ -9,7 +9,51 @@
 <body>
     <nav th:replace="~{_layout::menu}"/>
     <div class="container mt-5">
-        <h1> Bienvenue chez Basic Fitness Park <i class="fa-solid fa-dumbbell"></i> </h1>
+        <h1 class="text-center mb-5"> 
+            <i class="fa-solid fa-dumbbell"></i> 
+            Bienvenue chez Basic Fitness Park 
+        </h1>
+        
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card bg-light border-dark">
+                    <div class="card-body text-center">
+                        <i class="fa-solid fa-dumbbell fa-4x text-dark mb-3"></i>
+                        <h3 class="card-title">Routines</h3>
+                        <p class="card-text">Gérez vos routines d'entraînement</p>
+                        <a th:href="@{/routines}" class="btn btn-dark">
+                            <i class="fa fa-arrow-right"></i> Accéder
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card bg-light border-dark">
+                    <div class="card-body text-center">
+                        <i class="fa-solid fa-running fa-4x text-dark mb-3"></i>
+                        <h3 class="card-title">Exercices</h3>
+                        <p class="card-text">Consultez tous vos exercices</p>
+                        <a th:href="@{/exercises}" class="btn btn-dark">
+                            <i class="fa fa-arrow-right"></i> Accéder
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card bg-light border-dark">
+                    <div class="card-body text-center">
+                        <i class="fa-solid fa-list fa-4x text-dark mb-3"></i>
+                        <h3 class="card-title">Catalogue</h3>
+                        <p class="card-text">Types d'exercices disponibles</p>
+                        <a th:href="@{/exerciseTypes}" class="btn btn-dark">
+                            <i class="fa fa-arrow-right"></i> Accéder
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </body>

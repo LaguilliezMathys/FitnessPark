@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{_layout::header(~{::title}, _, ~{::script})}">
+    <title>Routines</title>
+    <script>
+        function confirmerSupp(event) {
+            if(!confirm("Confirmer la suppression de cette routine ?")) {
+                event.preventDefault();
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <nav th:replace="~{_layout::menu}"/>
+    
+    <div class="container mt-5">
+        <h1 class="mb-4"><i class="fa-solid fa-dumbbell"></i> Gestion des Routines</h1>
+        
+        <!-- Formulaire de recherche -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <form th:action="@{/routines}" method="get" class="input-group">
+                    <input type="text" name="mc" th:value="${motCle}" class="form-control" 
+                           placeholder="Rechercher une routine..." />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-search"></i> Rechercher
+                    </button>
+                </form>
+            </div>
+            <div class="col-md-6 text-end">
+                <a th:href="@{/routineEdit(id=0, mc=${motCle}, p=${page.number}, s=${page.size})}" 
+                   class="btn btn-success">
+                    <i class="fa fa-plus"></i> Ajouter une routine
+                </a>
+            </div>
+        </div>
+        
+        <!-- Alertes feedback -->
+        <div th:if="${action=='new' || action=='mod'}" class="alert alert-success alert-dismissible fade show">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <span th:if="${action=='new'}"><i class="fa fa-check-circle"></i> Routine créée : </span>
+            <span th:if="${action=='mod'}"><i class="fa fa-edit"></i> Routine modifiée : </span>
+            <strong th:text="${routine.name}"></strong>
+        </div>
+        <div th:if="${action=='del'}" class="alert alert-danger alert-dismissible fade show">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            Routine supprimée. <i class="fa fa-trash"></i>
+        </div>
+        
+        <!-- Tableau des routines -->
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Date création</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="routine : ${routines}">
+                        <td>
+                            <a th:href="@{/routineDetail(id=${routine.id}, mc=${motCle}, p=${page.number}, s=${page.size})}" 
+                               th:text="${routine.name}" class="text-decoration-none">
+                            </a>
+                        </td>
+                        <td th:text="${routine.description}"></td>
+                        <td th:text="${ #temporals.format(routine.creationDate, 'dd/MM/yyyy')}"></td>
+                        <td>
+                            <span th:if="${routine.status.name() == 'active'}" 
+                                  class="badge bg-success">Active</span>
+                            <span th:if="${routine.status.name() == 'inactive'}" 
+                                  class="badge bg-secondary">Inactive</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/routineDetail(id=${routine.id}, mc=${motCle}, p=${page.number}, s=${page.size})}" 
+                               class="btn btn-sm btn-primary" title="Détail">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                            <a th:href="@{/routineEdit(id=${routine.id}, mc=${motCle}, p=${page.number}, s=${page.size})}" 
+                               class="btn btn-sm btn-primary" title="Éditer">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <a th:href="@{/routineDelete(id=${routine.id}, mc=${motCle}, p=${page.number}, s=${page.size})}" 
+                               onclick="confirmerSupp(event)" class="btn btn-sm btn-danger" title="Supprimer">
+                                <i class="fa fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="row mt-3" th:if="${page.totalPages > 1}">
+            <div class="col-md-6">
+                <ul class="pagination">
+                    <li th:class="${page.first} ? 'page-item disabled' : 'page-item'">
+                        <a th:href="@{/routines(s=${page.size}, p=${page.number - 1}, mc=${motCle})}" 
+                           class="page-link">&laquo;</a>
+                    </li>
+                    <li th:each="i : ${ #numbers.sequence(0, page.totalPages-1)}"
+                        th:class="${i == page.number} ? 'page-item active' : 'page-item'">
+                        <a th:href="@{/routines(s=${page.size}, p=${i}, mc=${motCle})}" 
+                           class="page-link" th:text="${i+1}"></a>
+                    </li>
+                    <li th:class="${page.last} ? 'page-item disabled' : 'page-item'">
+                        <a th:href="@{/routines(s=${page.size}, p=${page.number + 1}, mc=${motCle})}" 
+                           class="page-link">&raquo;</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-6 text-end">
+                <form method="get" class="d-inline-block">
+                    <input type="hidden" name="p" th:value="${page.number}" />
+                    <input type="hidden" name="mc" th:value="${motCle}" />
+                    <label>Éléments par page : </label>
+                    <select name="s" onchange="this.form.submit()" class="form-select d-inline-block w-auto">
+                        <option value="5" th:selected="${page.size==5}">5</option>
+                        <option value="10" th:selected="${page.size==10}">10</option>
+                        <option value="20" th:selected="${page.size==20}">20</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+        
+        <p class="text-muted mt-3">
+            Total : <strong th:text="${page.totalElements}"></strong> routine(s) - 
+            Page <strong th:text="${page.number + 1}"></strong> sur <strong th:text="${page.totalPages}"></strong>
+        </p>
+    </div>
+</body>
+
+</html>

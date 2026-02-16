@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{_layout::header(~{::title}, _, _)}">
+    <title>Édition Exercice</title>
+</head>
+
+<body>
+    <nav th:replace="~{_layout::menu}"/>
+    
+    <div class="container mt-5">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-running"></i> 
+            <span th:if="${exercise.id == null}">Nouvel Exercice</span>
+            <span th:if="${exercise.id != null}">Éditer Exercice</span>
+        </h1>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <form th:action="@{/exerciseSave}" th:object="${exercise}" method="post">
+                    <!-- Champs cachés -->
+                    <input type="hidden" th:field="*{id}" />
+                    <input type="hidden" name="routineId" th:value="${routineId}" />
+                    <input type="hidden" name="returnUrl" th:value="${returnUrl}" />
+                    <input type="hidden" name="p" th:value="${p}" />
+                    <input type="hidden" name="s" th:value="${s}" />
+                    <input type="hidden" name="mc" th:value="${mc}" />
+                    
+                    <!-- Routine -->
+                    <div class="mb-3">
+                        <label for="routine" class="form-label">Routine *</label>
+                        <select th:field="*{routine}" id="routine"
+                                th:class="${ #fields.hasErrors('routine')} ? 'form-select is-invalid' : 'form-select'">
+                            <option value="">-- Sélectionner une routine --</option>
+                            <option th:each="r : ${routines}" 
+                                    th:value="${r.id}" 
+                                    th:text="${r.name}">
+                            </option>
+                        </select>
+                        <div th:errors="*{routine}" class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Nom -->
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom de l'exercice *</label>
+                        <input type="text" th:field="*{name}" id="name"
+                               th:class="${ #fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'"
+                               placeholder="Ex: Pompes" />
+                        <div th:errors="*{name}" class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Répétitions -->
+                    <div class="mb-3">
+                        <label for="repetitions" class="form-label">Nombre de répétitions *</label>
+                        <input type="number" th:field="*{repetitions}" id="repetitions" min="1"
+                               th:class="${ #fields.hasErrors('repetitions')} ? 'form-control is-invalid' : 'form-control'"
+                               placeholder="Ex: 20" />
+                        <div th:errors="*{repetitions}" class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Poids -->
+                    <div class="mb-3">
+                        <label for="weight" class="form-label">Poids (kg) *</label>
+                        <input type="number" th:field="*{weight}" id="weight" min="0" step="0.5"
+                               th:class="${ #fields.hasErrors('weight')} ? 'form-control is-invalid' : 'form-control'"
+                               placeholder="Ex: 10.5" />
+                        <div th:errors="*{weight}" class="invalid-feedback"></div>
+                        <small class="form-text text-muted">0 pour exercices au poids du corps</small>
+                    </div>
+                    
+                    <!-- Boutons -->
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> Valider
+                        </button>
+                        <a th:if="${returnUrl == 'detail' && routineId > 0}" 
+                           th:href="@{/routineDetail(id=${routineId})}" 
+                           class="btn btn-secondary">
+                            <i class="fa fa-times"></i> Annuler
+                        </a>
+                        <a th:unless="${returnUrl == 'detail' && routineId > 0}" 
+                           th:href="@{/exercises(p=${p}, s=${s}, mc=${mc})}" 
+                           class="btn btn-secondary">
+                            <i class="fa fa-times"></i> Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

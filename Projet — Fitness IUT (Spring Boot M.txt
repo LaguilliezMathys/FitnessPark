@@ -1,0 +1,142 @@
+Projet — Fitness IUT (Spring Boot MVC + REST)
+1) Contexte
+Vous devez développer une application Spring Boot permettant de gérer des routines de fitness.
+Une routine contient plusieurs exercices.
+Routines : nom, description, date de création, statut (active/inactive)
+Exercices : nom, répétitions, poids
+Routines
+id: Long «PK»
+name: String
+description: String
+creation_date: LocalDate
+status: String (active/inactive)
+Exercises
+id: Long «PK»
+name: String
+repetitions: Integer
+weight: Double
+routine_id: Long «FK»
+contains
+1 *
+La base de données est imposée (dump SQL fourni). Elle sera utilisée telle quelle pour la correction.
+2) Contraintes techniques (imposées)
+Java 21
+Maven
+Spring Boot 3.x
+2026-projet-fitness.md 2026-02-10
+2 / 5
+MariaDB (ou MySQL compatible)
+Dépendances attendues :
+Spring Web
+Spring Data JPA
+Thymeleaf
+Validation (spring-boot-starter-validation)
+L’application doit démarrer en port 8081
+configuration via server.port=8081
+L’application doit proposer :
+une partie MVC Thymeleaf (site web)
+une petite API REST (JSON)
+3) Base de données imposée
+Importer le fichier de dump SQL fourni (ex : fitness_iut_dump.sql).
+Le schéma et les données ne doivent pas être modifiés (sauf ajout de tables bonus si vous réalisez des
+bonus).
+Les suppressions doivent rester cohérentes (une routine supprimée ne doit pas laisser d’exercices
+orphelins).
+4) Fonctionnalités minimales
+A. Routines
+1. Liste des routines (page web)
+liste paginée
+recherche sur le nom ou nom + description)
+conservation des paramètres lors de la navigation
+2. Détail d’une routine
+affichage des informations de la routine
+affichage de la liste des exercices associés
+3. Créer une routine (formulaire)
+validation serveur (voir section Validation)
+redirection + message de confirmation
+4. Modifier une routine (formulaire)
+pré-remplissage
+validation serveur
+redirection + message de confirmation
+5. Supprimer une routine
+confirmation côté client (JavaScript)
+2026-projet-fitness.md 2026-02-10
+3 / 5
+la suppression doit supprimer aussi ses exercices (cascade)
+redirection vers la liste (en conservant le contexte d'origine)
+B. Exercices (dans une routine)
+6. Ajouter un exercice à une routine
+7. Modifier un exercice
+8. Supprimer un exercice
+9. Après ces actions, retour “propre” (redirection) en conservant le contexte de navigation.
+5) Validation (obligatoire)
+Vous devez utiliser Bean Validation (@Valid + BindingResult) et afficher les erreurs dans les formulaires.
+Routine
+name : obligatoire, taille min/max (ex : 3 à 120)
+status : obligatoire (active / inactive)
+Exercice
+name : obligatoire (taille min/max raisonnable)
+repetitions : entier >= 1
+weight : nombre >= 0
+6) API REST (obligatoire)
+L’API REST doit être accessible sous le préfixe /api.
+Endpoints minimaux attendus :
+GET /api/routines : liste des routines
+GET /api/routines/{id} : détail d’une routine
+POST /api/routines : création d’une routine
+DELETE /api/routines/{id} : suppression d’une routine
+Option recommandé (non obligatoire, mais valorisé) :
+pagination / filtre sur GET /api/routines (paramètres page / size et/ou mc)
+Remarque : vous pouvez renvoyer les exercices dans le détail, ou proposer un endpoint séparé (au
+choix). L’important est que l’API soit utilisable et démontrée dans la documentation.
+7) Livrables (obligatoires)
+A. Code source
+dépôt (zip ou repo) du code source complet
+projet Maven compilable (mvn clean package)
+2026-projet-fitness.md 2026-02-10
+4 / 5
+B. JAR exécutable
+fournir le JAR exécutable (issu du build Maven)
+le JAR doit lancer le site sur le port 8081
+attendu : java -jar votre-app.jar
+C. Documentation PDF
+Fournir un PDF contenant :
+une liste claire de ce qui a été développé (fonctionnalités OK / non OK)
+une liste complémentaire des options ajoutées au projet (bonus)
+la liste exhaustive des endpoints REST (et éventuels paramètres)
+un endpoint existant mais non listé entraine une pénalité
+8) Grille de notation (sur 18) + bonus
+1) MVC — Routines (8 points)
+Liste paginée + choix taille + conservation p/s : 3 pts
+Recherche mc + conservation mc dans pagination/édition : 2 pts
+CRUD routine (create/update) avec redirections + messages : 2 pts
+Suppression routine + cohérence (cascade/aucun orphelin) : 1 pt
+2) MVC — Exercices (5 points)
+Ajouter un exercice à une routine : 2 pts
+Modifier un exercice : 1 pt
+Supprimer un exercice + retour propre : 1 pt
+3) Validation (2 points)
+Validation routine (serveur) + affichage erreurs : 1 pt
+Validation exercice (serveur) + affichage erreurs : 1 pt
+4) REST (3 points)
+Total : 18 points
+Points bonus (jusqu’à +2 points dans une grille de 4 points)
+Au choix (exemples) :
+Aide à la saisie des exercices via exercise_types (datalist/autocomplete)
+Statistiques sur la routine (total répétitions, total charge, etc.)
+Filtre MVC et/ou REST supplémentaires
+Pagination/filtre sur l’API REST
+Gestion d’erreurs REST propre (codes HTTP, messages)
+2026-projet-fitness.md 2026-02-10
+5 / 5
+9) Attendus de qualité
+Code lisible, structuré (entity/repository/controller, service si nécessaire)
+Pas de duplications inutiles
+Messages utilisateur (alert) après create/update/delete
+Navigation cohérente (redirections, conservation des paramètres)
+10) Conseils / pièges classiques
+Vérifier la cohérence des relations JPA (suppression et cascades)
+Attention aux Optional (id inexistant)
+Bien gérer @Valid + BindingResult avant save
+Penser à conserver p/s/mc/... lors des redirections
+Pour REST : éviter les problèmes de sérialisation (boucles) si vous exposez des relations bidirectionnelles

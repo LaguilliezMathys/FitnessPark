@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{_layout::header(~{::title}, _, _)}">
+    <title>Édition Type d'Exercice</title>
+</head>
+
+<body>
+    <nav th:replace="~{_layout::menu}"/>
+    
+    <div class="container mt-5">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-list"></i> 
+            <span th:if="${exerciseType.id == null}">Nouveau Type d'Exercice</span>
+            <span th:if="${exerciseType.id != null}">Éditer Type d'Exercice</span>
+        </h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <form th:action="@{/exerciseTypeSave}" th:object="${exerciseType}" method="post">
+                    <!-- Champs cachés -->
+                    <input type="hidden" th:field="*{id}" />
+                    <input type="hidden" name="p" th:value="${p}" />
+                    <input type="hidden" name="s" th:value="${s}" />
+                    <input type="hidden" name="mc" th:value="${mc}" />
+                    
+                    <!-- ID (pour nouveau uniquement) -->
+                    <div class="mb-3" th:if="${exerciseType.id == null}">
+                        <label for="id" class="form-label">ID *</label>
+                        <input type="number" th:field="*{id}" id="id"
+                               class="form-control"
+                               placeholder="Ex: 71" required />
+                        <small class="form-text text-muted">L'ID doit être unique</small>
+                    </div>
+                    
+                    <!-- Nom -->
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom *</label>
+                        <input type="text" th:field="*{name}" id="name"
+                               th:class="${ #fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'"
+                               placeholder="Ex: Pompes" />
+                        <div th:errors="*{name}" class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Boutons -->
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> Valider
+                        </button>
+                        <a th:href="@{/exerciseTypes(p=${p}, s=${s}, mc=${mc})}" class="btn btn-secondary">
+                            <i class="fa fa-times"></i> Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

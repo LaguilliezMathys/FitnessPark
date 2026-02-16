@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{_layout::header(~{::title}, _, _)}">
+    <title>Édition Routine</title>
+</head>
+
+<body>
+    <nav th:replace="~{_layout::menu}"/>
+    
+    <div class="container mt-5">
+        <h1 class="mb-4">
+            <i class="fa-solid fa-dumbbell"></i> 
+            <span th:if="${routine.id == null}">Nouvelle Routine</span>
+            <span th:if="${routine.id != null}">Éditer Routine</span>
+        </h1>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <form th:action="@{/routineSave}" th:object="${routine}" method="post">
+                    <!-- Champs cachés -->
+                    <input type="hidden" th:field="*{id}" />
+                    <input type="hidden" name="p" th:value="${p}" />
+                    <input type="hidden" name="s" th:value="${s}" />
+                    <input type="hidden" name="mc" th:value="${mc}" />
+                    
+                    <!-- Nom -->
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nom *</label>
+                        <input type="text" th:field="*{name}" id="name"
+                               th:class="${ #fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'"
+                               placeholder="Ex: Routine Matinale" />
+                        <div th:errors="*{name}" class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea th:field="*{description}" id="description" rows="4"
+                                  th:class="${ #fields.hasErrors('description')} ? 'form-control is-invalid' : 'form-control'"
+                                  placeholder="Description de la routine..."></textarea>
+                        <div th:errors="*{description}" class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Date de création -->
+                    <div class="mb-3">
+                        <label for="creationDate" class="form-label">Date de création *</label>
+                        <input type="date" th:field="*{creationDate}" id="creationDate"
+                               th:class="${ #fields.hasErrors('creationDate')} ? 'form-control is-invalid' : 'form-control'" />
+                        <div th:errors="*{creationDate}" class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Statut -->
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Statut *</label>
+                        <select th:field="*{status}" id="status"
+                                th:class="${ #fields.hasErrors('status')} ? 'form-select is-invalid' : 'form-select'">
+                            <option th:each="statusOption : ${T(fr.iut.fitnesspark.model.Routines.Status).values()}"
+                                    th:value="${statusOption}"
+                                    th:text="${statusOption.name() == 'active' ? 'Active' : 'Inactive'}">
+                            </option>
+                        </select>
+                        <div th:errors="*{status}" class="invalid-feedback"></div>
+                    </div>
+                    
+                    <!-- Boutons -->
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i> Valider
+                        </button>
+                        <a th:href="@{/routines(p=${p}, s=${s}, mc=${mc})}" class="btn btn-secondary">
+                            <i class="fa fa-times"></i> Annuler
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

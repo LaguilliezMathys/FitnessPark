@@ -9,8 +9,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class HomeController {
     
     @GetMapping("/")
+    public String acceuil(){
+        return "home";
+    }
+
+    @GetMapping("/home")
     public String home(){
         return "home";
     }
+
 
 }

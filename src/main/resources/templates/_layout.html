@@ -37,15 +37,20 @@
             <div class="collapse navbar-collapse" id="navbarColor02">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Features</a>
+                        <a class="nav-link" th:href="@{/routines}">
+                            <i class="fa-solid fa-dumbbell"></i> Routines
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/produit}">Nos produits</a>
+                        <a class="nav-link" th:href="@{/exercises}">
+                            <i class="fa-solid fa-running"></i> Exercices
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/cgv}">A propos</a>
+                        <a class="nav-link" th:href="@{/exerciseTypes}">
+                            <i class="fa-solid fa-list"></i> Types d'exercices
+                        </a>
                     </li>
-
                 </ul>
             </div>
         </div>

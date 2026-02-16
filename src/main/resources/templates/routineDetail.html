@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{_layout::header(~{::title}, _, ~{::script})}">
+    <title>Détail Routine</title>
+    <script>
+        function confDelExercise(event) {
+            if(!confirm("Confirmer la suppression de cet exercice ?")) {
+                event.preventDefault();
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <nav th:replace="~{_layout::menu}"/>
+    
+    <div class="container mt-5">
+        <!-- En-tête routine -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1>
+                    <i class="fa-solid fa-dumbbell"></i> 
+                    <span th:text="${routine.name}"></span>
+                </h1>
+                <p class="text-muted" th:text="${routine.description}"></p>
+                <p>
+                    <span class="badge bg-secondary">
+                        Créée le <span th:text="${ #temporals.format(routine.creationDate, 'dd/MM/yyyy')}"></span>
+                    </span>
+                    <span th:if="${routine.status.name() == 'active'}" 
+                          class="badge bg-success">Active</span>
+                    <span th:if="${routine.status.name() == 'inactive'}" 
+                          class="badge bg-secondary">Inactive</span>
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a th:href="@{/routineEdit(id=${routine.id}, mc=${mc}, p=${p}, s=${s})}" 
+                   class="btn btn-primary">
+                    <i class="fa fa-edit"></i> Modifier routine
+                </a>
+                <a th:href="@{/routines(p=${p}, s=${s}, mc=${mc})}" 
+                   class="btn btn-secondary">
+                    <i class="fa fa-arrow-left"></i> Retour
+                </a>
+            </div>
+        </div>
+        
+        <!-- Liste des exercices -->
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3><i class="fa-solid fa-running"></i> Exercices de cette routine</h3>
+                    <a th:href="@{/exerciseEdit(id=0, routineId=${routine.id}, returnUrl=detail)}" 
+                       class="btn btn-success">
+                        <i class="fa fa-plus"></i> Ajouter un exercice
+                    </a>
+                </div>
+                
+                <!-- Alertes feedback pour exercices -->
+                <div th:if="${action=='new'}" class="alert alert-success alert-dismissible fade show">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <i class="fa fa-check-circle"></i> Exercice ajouté avec succès !
+                </div>
+                <div th:if="${action=='mod'}" class="alert alert-success alert-dismissible fade show">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <i class="fa fa-edit"></i> Exercice modifié avec succès !
+                </div>
+                <div th:if="${action=='del'}" class="alert alert-warning alert-dismissible fade show">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <i class="fa fa-trash"></i> Exercice supprimé
+                </div>
+                
+                <div th:if="${ #lists.isEmpty(routine.exercises)}" class="alert alert-info">
+                    <i class="fa fa-info-circle"></i> Aucun exercice dans cette routine pour le moment.
+                </div>
+                
+                <div th:unless="${ #lists.isEmpty(routine.exercises)}" class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nom</th>
+                                <th>Répétitions</th>
+                                <th>Poids (kg)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="exercise, iterStat : ${routine.exercises}">
+                                <td th:text="${iterStat.count}"></td>
+                                <td th:text="${exercise.name}"></td>
+                                <td th:text="${exercise.repetitions}"></td>
+                                <td th:text="${ #numbers.formatDecimal(exercise.weight, 1, 2)} + ' kg'"></td>
+                                <td>
+                                    <a th:href="@{/exerciseEdit(id=${exercise.id}, routineId=${routine.id}, returnUrl=detail)}" 
+                                       class="btn btn-sm btn-primary" title="Éditer">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a th:href="@{/exerciseDelete(id=${exercise.id}, routineId=${routine.id}, returnUrl=detail)}" 
+                                       onclick="confDelExercise(event)" class="btn btn-sm btn-danger" title="Supprimer">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <!-- Statistiques -->
+                    <div class="card bg-light border-primary mt-3">
+                        <div class="card-body">
+                            <h5><i class="fa fa-chart-bar"></i> Stats pour les nerds</h5>
+                            <p class="mb-1">
+                                <strong>Nombre d'exercices :</strong> 
+                                <span th:text="${ #lists.size(routine.exercises)}"></span>
+                            </p>
+                            <p class="mb-1">
+                                <strong>Total répétitions :</strong> 
+                                <span th:text="${ #aggregates.sum(routine.exercises.![repetitions])}"></span>
+                            </p>
+                            <p class="mb-0">
+                                <strong>Charge totale :</strong> 
+                                <span th:text="${ #numbers.formatDecimal(#aggregates.sum(routine.exercises.![weight]), 1, 2)} + ' kg'"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
